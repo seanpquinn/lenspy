@@ -1,28 +1,54 @@
-#!/usr/bin/env python
-# coding: utf-8
+# -*- coding: utf-8 -*-
 import cv2
 import numpy as np
 import signal
 import sys
 import time
 
-ocv_data_path = "/usr/share/opencv/"
-ocv_cascade = "haarcascades/haarcascade_frontalface_default.xml"
-fc = cv2.CascadeClassifier(ocv_data_path+ocv_cascade)
+imgdir="/home/somewhere/"  
+face_data = "data/haarcascade_frontalface_default.xml"
+fc = cv2.CascadeClassifier(face_data)
 
-def sigterm_handler(signal, frame):
-  print "Got SIGTERM, exiting."
-  sys.exit(0)
+#these are sizes we ask from camera and how we set default
+#lens and source plane distance parameters
+HEIGHT=840
+WIDTH=840
 
 def takePic():
+  """Useage: takePic()
+
+Parameters
+----------
+None
+
+Returns
+----------
+ret : int
+	Return code from cv2.VideoCapture
+img : 2d numpy array
+	Pixel values for image data"""
   cp = cv2.VideoCapture(0)
-  cp.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT,1024)
-  cp.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH,1280)
+  cp.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT,HEIGHT)
+  cp.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH,WIDTH)
   ret, img = cp.read()
   cp.release()
   return ret, img
 
 def findFaces(x):
+  """Useage: findFaces(x)
+
+Parameters
+----------
+x : 2d array of floats. 
+	Image data from cv2 capture
+
+Returns
+----------
+retcode : int
+  Return code from cv2.VideoCapture
+faces : 2d numpy array
+	Array containing coordinates of recognized faces"""
+
   gray = cv2.cvtColor(x, cv2.COLOR_BGR2GRAY)
   faces = fc.detectMultiScale(gray, 1.2, 2)
   retcode = 0
@@ -31,8 +57,23 @@ def findFaces(x):
   return retcode,faces
 
 def getFace(x,y):
-  """Takes image array from takePic and array found from  findFaces
-  and performs lensing on the largest face. Returns lensed image"""
+  """Useage: getFacee(x,y)
+
+Parameters
+----------
+x,y : 2d array of floats. 
+  Image data from cv2 capture
+
+Returns
+----------
+x0 : int
+	x coordinate at the center of face
+y0 : int
+	y coordinate at center of face
+w : int
+	width of recognized face
+x : 2d numpy array
+  Array containing pixel data for image"""
   areas = y[:,2]*y[:,3]
   maxfc = np.argmax(areas)
   x0,y0,w = y[maxfc,0:3]
@@ -40,7 +81,24 @@ def getFace(x,y):
   return x0,y0,w,x
 
 def lensImage(img,src,lens,xs,ys):
-  """Lens image x using given parameters"""
+  """Useage: lensImage(img,src,lens,xs,ys)
+  lens a 2d numpy array in place using a given source distance src and 
+  black hole coordinate (xs,ys).
+
+Parameters
+----------
+img : 2d array of floats. 
+  Image data from cv2 capture
+src : float
+  Distance to source (pixels)
+lens : float
+  GR lens parameters
+xs,ys : int
+  pixel coordinates of black hold location
+
+Returns
+----------
+None"""
   # edits image in place
   if (lens >= src):
     raise RuntimeError("lens: " + str(lens) + 
@@ -68,33 +126,42 @@ def lensImage(img,src,lens,xs,ys):
   img[x,y]=imageCopy[dXshift,dYshift]
 
 cap = cv2.VideoCapture(0)
-cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT,1024)
-cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH,1280)
+cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT,HEIGHT)
+cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH,WIDTH)
+kk = 0
 while True:
-  #rcode, new_img = takePic()
   rcode, new_img = cap.read()
-  if rcode == False:
-    continue #If image capture fails, take another
   rcode, faces_arr = findFaces(new_img)
   if rcode == 0:
     continue #No face found or other error, take new picture
   xx,yy,ww,face_img = getFace(new_img,faces_arr)
-  print xx,yy,faces_arr
-  cv2.rectangle(new_img, (xx, yy), (xx+ww, yy+ww), (0, 255, 0), 2)
+  #cv2.rectangle(new_img, (xx, yy), (xx+ww, yy+ww), (0, 255, 0), 2)
   height, width, colors = new_img.shape
-  xrand = np.random.randint(xx,xx+ww)
-  yrand = np.random.randint(yy,yy+ww)
-  source = 10*max(height,width)   #image Distance (in pixels)
-  lens = source/2                 #distance to hole
-  lensImage(new_img, source, lens, yrand, xrand)
+  #xrand = np.random.randint(xx,xx+ww)
+  #yrand = np.random.randint(yy,yy+ww)
+  xc = xx+ww/2+80*np.cos(kk/5.)
+  yc = yy+ww/2+80*np.sin(kk/5.)
+  area_ratio = float(ww*ww)/HEIGHT/WIDTH
+  source = 10*max(HEIGHT,WIDTH)   #image Distance (in pixels)
+#  lens = source/2                 #distance to hole
+  #print "area_ratio=" + str(area_ratio)
+  # area ratio ranges from about .003 to .04 typically
+  # dont want lens image to go negative
+  lens = max((8.0 - 70*area_ratio)*source/9, source/9.0)
+  #lensImage(new_img, source, lens, yrand, xrand)
+  lensImage(new_img, source, lens, yc, xc)
   cv2.imshow("Lensed Me!", new_img)
-  #cv2.waitKey(50)
   if cv2.waitKey(1) & 0xFF == ord('q'):
     break
+  sec=time.strftime("%S",time.localtime())
+  if sec=='50':
+    filename=time.strftime("%H%M%S%Y",time.localtime())
+    cv2.imwrite(imgdir+filename+".png",new_img)
   #time.sleep(0.2)
   #cv2.imwrite("JustLensed.jpg", face_img)
   #new_img[yy:yy+ww,xx:xx+ww] = face_img
   #cv2.imwrite("Orig+lens.jpg", new_img)
   #signal.signal(signal.SIGTERM, sigterm_handler)
+  kk+=1
 cap.release()
 cap.destroyAllWindows()

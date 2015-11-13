@@ -9,6 +9,7 @@ The code is single Python2 script which uses the OpenCV library to recognize fac
 It was developed on Linux Machines running Ubuntu 14 LTS as well as Ubuntu 15. Install instructions assume you are running on the same environment. Unfortunately other platforms aren't currently supported.
 
 If successfully installed, you'll be able to use your camera to generate real time lensed video, such as the example provided below
+
 ![](https://imogen.phys.cwru.edu/img/animation.gif)
 
 # Hardware 
@@ -24,7 +25,7 @@ If successfully installed, you'll be able to use your camera to generate real ti
 
 # Dependencies
 
-We rely on the OpenCV python wrapper. This is unfortunately not maintained on PyPI or I would have attempted to make this program into its own PyPI package.
+We rely on the OpenCV Python wrapper. This is unfortunately not maintained on PyPI or I would have attempted to make this program into its own PyPI package.
 
 Fortunately on Ubuntu someone has graciously decided to maintain the OpenCV Python2 wrapper. Install using
 
@@ -50,7 +51,7 @@ When that's complete run the script using
 python lens.py
 ```
 
-Since it's a very basic program, to quit just use ```Ctrl-C``
+Since it's a very basic program, to quit just use ```Ctrl-C``1
 
 # Conclusions
 

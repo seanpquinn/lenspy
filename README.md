@@ -51,7 +51,7 @@ When that's complete run the script using
 python lens.py
 ```
 
-Since it's a very basic program, to quit just use ```Ctrl-C``1
+Since it's a very basic program, to quit just use ```Ctrl-C```
 
 # Conclusions
 

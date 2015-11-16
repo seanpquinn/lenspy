@@ -2,7 +2,6 @@
 
 declare -i mode
 mode=1
-trap 
 while true; do
   case $mode in
   1)

@@ -7,28 +7,49 @@ ii=$$
 while true; do
   case $mode in
   1)
-    python lens_circ.py &
+    python lenspy.py circ &
     lenspid=$!
     trap "kill $lenspid;kill -s KILL $ii" SIGINT SIGTERM
-    sleep 2m
+    sleep 1m
     mode=2
     kill $lenspid
     ;;
   2)
-    python lens_lem.py &
+    python lenspy.py lem &
     lenspid=$!
     trap "kill $lenspid;kill -s KILL $ii" SIGINT SIGTERM
-    sleep 2m
+    sleep 1m
     mode=3
     kill $lenspid
     ;;
   3)
-    python lens_rand.py &
+    python lenspy.py rand &
     lenspid=$!
     trap "kill $lenspid;kill -s KILL $ii" SIGINT SIGTERM
-    sleep 2m
-    mode=1
+    sleep 1m
+    mode=4
     kill $lenspid
     ;;
+  4)
+    python lenspy.py lissajous &
+    lenspid=$!
+    trap "kill $lenspid;kill -s KILL $ii" SIGINT SIGTERM
+    sleep 1m
+    mode=5
+    kill $lenspid
+  5)
+    python lenspy.py cray &
+    lenspid=$!
+    trap "kill $lenspid;kill -s KILL $ii" SIGINT SIGTERM
+    sleep 1m
+    mode=6
+    kill $lenspid
+  6)
+    python lenspy.py hypotrochoid &
+    lenspid=$!
+    trap "kill $lenspid;kill -s KILL $ii" SIGINT SIGTERM
+    sleep 1m
+    mode=1
+    kill $lenspid
   esac
 done

@@ -188,6 +188,7 @@ while True:
   lens = max((8.0 - 70*area_ratio)*source/9, source/9.0)
   lensImage(new_img, source, lens, yc, xc)
   cv2.imshow("Lensed Me!", new_img)
+  cv2.moveWindow("Lensed Me!",1020,140)
   if cv2.waitKey(1) & 0xFF == ord('q'):
     break
   sec=time.strftime("%S",time.localtime())

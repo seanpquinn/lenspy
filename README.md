@@ -6,7 +6,7 @@ The code makes use of the formalism presented in "Gravitational lensing by cosmi
 
 The code is a single Python2 script which uses the OpenCV library to recognize faces combined with NumPy for array computations.
 
-It was developed on Linux Machines running Ubuntu 14 LTS as well as Ubuntu 15. Install instructions assume you are running on the same environment. Unfortunately other platforms aren't currently supported. However, if your system has Python2 and the OpenCV library, chances are good the script will work for you to.
+It was developed on Linux Machines running Ubuntu 14 LTS as well as Ubuntu 15. Install instructions assume you are running on the same environment. Unfortunately other platforms aren't currently supported. However, if your system has Python2 and the OpenCV library, chances are good the script will work for you too.
 
 If successfully installed, you'll be able to use your camera to generate real time lensed video, such as the example provided below
 

@@ -37,6 +37,7 @@ while true; do
     sleep 1m
     mode=5
     kill $lenspid
+    ;;
   5)
     python lenspy.py cray &
     lenspid=$!
@@ -44,6 +45,7 @@ while true; do
     sleep 1m
     mode=6
     kill $lenspid
+    ;;
   6)
     python lenspy.py hypotrochoid &
     lenspid=$!
@@ -51,5 +53,6 @@ while true; do
     sleep 1m
     mode=1
     kill $lenspid
+    ;;
   esac
 done
